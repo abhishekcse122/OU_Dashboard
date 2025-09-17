@@ -420,34 +420,23 @@ cancelBtn.addEventListener('click', function(){
 });
 
 // Copy buttons: decode base64 then copy "username:password"
-document.querySelectorAll('.copy-btn').forEach(btn=>{
-  btn.addEventListener('click', async function(){
+document.querySelectorAll('.copy-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
     const b64 = btn.getAttribute('data-b64');
-    const user = btn.getAttribute('data-user');
-    // decode base64
-    let pwd = '';
+    let pwd = "";
     try {
-      pwd = decodeURIComponent(atob(b64).split('').map(function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
-    } catch(e){ pwd = atob(b64); }
-    const text = user + ':' + pwd;
-    try {
-      if(navigator.clipboard && navigator.clipboard.writeText){
-        await navigator.clipboard.writeText(text);
-      } else {
-        const ta = document.createElement('textarea'); ta.value = text; ta.style.position='fixed'; ta.style.left='-9999px';
-        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-      }
-      // show temporary copied label
-      const copiedLabel = btn.nextElementSibling;
-      if(copiedLabel){
-        copiedLabel.style.display='inline';
-        setTimeout(()=> copiedLabel.style.display='none', 1800);
-      }
-    } catch(err){
-      alert('Copy failed: ' + err);
+      pwd = decodeURIComponent(atob(b64).split('').map(c =>
+        '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+      ).join(''));
+    } catch(e) {
+      pwd = atob(b64);
     }
+    await navigator.clipboard.writeText(pwd);
+
+    // show "Copied" message
+    const copied = btn.parentElement.querySelector('.copied');
+    copied.style.display = "inline";
+    setTimeout(() => copied.style.display = "none", 1500);
   });
 });
 </script>
