@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Password Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #0f172a;
+      color: #e6eef8;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #f8fafc;
+      margin-bottom: 30px;
+    }
+    .env-card {
+      background: linear-gradient(180deg, #111827 0%, #0b1220 100%);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 25px;
+      box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+    }
+    .env-card h2 {
+      margin: 0 0 15px 0;
+      font-size: 18px;
+      color: #facc15;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      text-align: left;
+      font-size: 14px;
+    }
+    th {
+      color: #9fb0c8;
+      font-weight: 600;
+    }
+    td .masked {
+      letter-spacing: 2px;
+      user-select: none;
+    }
+    button {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #e6eef8;
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      margin-left: 8px;
+    }
+    .copied {
+      font-size: 12px;
+      color: #10b981;
+      margin-left: 8px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Environment Password Dashboard</h1>
+
+  <div id="cards"></div>
+
+  <script>
+    const users = {
+      app: { user: "SYSUSER", pass: "c3lzdXNlcjAw" },      // sysuser00 (base64)
+      wl:  { user: "weblogic", pass: "V2VsY29tZTEyMw==" }, // Welcome123 (base64)
+      db:  { user: "CISADM", pass: "V2VsY29tZTE=" }        // Welcome1 (base64)
+    };
+
+    const envs = [
+      { name: "DEV01" },
+      { name: "DEV03" },
+      { name: "TEST" },
+      { name: "PRE-PROD" },
+      { name: "PROD" },
+      { name: "TRAINING" },
+      { name: "PROJ1" },
+      { name: "PROJ2" }
+    ];
+
+    const apps = ["C2M", "BIP", "Documaker", "OUCSS"];
+
+    function decode(str) {
+      try {
+        return decodeURIComponent(atob(str).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+      } catch (e) {
+        return atob(str);
+      }
+    }
+
+    function copyToClipboard(text, id) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => showCopied(id));
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showCopied(id);
+      }
+    }
+
+    function showCopied(id) {
+      const el = document.getElementById(id);
+      el.style.display = 'inline';
+      setTimeout(() => { el.style.display = 'none'; }, 2000);
+    }
+
+    const cardsDiv = document.getElementById("cards");
+
+    envs.forEach(env => {
+      const card = document.createElement("div");
+      card.className = "env-card";
+      card.innerHTML = `<h2>${env.name}</h2>`;
+
+      let table = `<table>
+        <thead>
+          <tr>
+            <th>Application</th>
+            <th>App User</th>
+            <th>WebLogic User</th>
+            <th>DB User</th>
+          </tr>
+        </thead>
+        <tbody>`;
+
+      apps.forEach(app => {
+        table += `<tr>
+          <td>${app}</td>
+          <td>
+            ${users.app.user} / <span class="masked">•••••••</span>
+            <button onclick="copyToClipboard('${users.app.user}:${decode(users.app.pass)}','c${env.name}${app}app')">Copy</button>
+            <span id="c${env.name}${app}app" class="copied">Copied ✔</span>
+          </td>
+          <td>
+            ${users.wl.user} / <span class="masked">•••••••</span>
+            <button onclick="copyToClipboard('${users.wl.user}:${decode(users.wl.pass)}','c${env.name}${app}wl')">Copy</button>
+            <span id="c${env.name}${app}wl" class="copied">Copied ✔</span>
+          </td>
+          <td>
+            ${users.db.user} / <span class="masked">•••••••</span>
+            <button onclick="copyToClipboard('${users.db.user}:${decode(users.db.pass)}','c${env.name}${app}db')">Copy</button>
+            <span id="c${env.name}${app}db" class="copied">Copied ✔</span>
+          </td>
+        </tr>`;
+      });
+
+      table += `</tbody></table>`;
+      card.innerHTML += table;
+      cardsDiv.appendChild(card);
+    });
+  </script>
+</body>
+</html>

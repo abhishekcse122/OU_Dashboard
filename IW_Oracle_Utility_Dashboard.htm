@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Environment Dashboard</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f1f5f9;
+  margin: 0;
+}
+h1 {
+  text-align: center;
+  padding: 16px;
+  background: #0f172a;
+  color: white;
+  margin: 0;
+}
+.dashboard {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  flex-wrap: wrap;
+}
+.column {
+  flex: 1;
+  min-width: 300px;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.column h2 {
+  margin: 0;
+  padding: 10px;
+  color: white;
+}
+.section {
+  background: white;
+  margin: 10px;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.section h3 {
+  background: #e2e8f0;
+  margin: 0;
+  padding: 6px 10px;
+  font-size: 14px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+th, td {
+  border-top: 1px solid #e5e7eb;
+  padding: 6px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+a {
+  color: #0284c7;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+</style>
+</head>
+<body>
+<h1>Oracle Utilities Applications Dashboard</h1>
+<div class="dashboard">
+
+  <!-- DEV + SIT Column -->
+  <div class="column" style="background:#0284c733">
+    <h2 style="background:#0284c7">DEV & SIT</h2>
+
+    <!-- DEV - C2M -->
+    <div class="section">
+      <h3>C2M - DEV01</h3>
+      <table>
+        <thead><tr><th>App Link</th><th>WL Console</th><th>DB</th><th>Host/IP</th></tr></thead>
+        <tbody><tr>
+          <td><a href="https://10.90.158.5:9072/ouaf/cis.jsp">App</a></td><td><a href="https://10.90.158.5:7002/console">WL</a></td>
+          <td><a href="//10.90.159.5:1521/pc2mdev1.iwocfrac2mdevdb.iwocfrac2mdevdb.oraclevcn.com">jdbc:dev_c2m</a></td><td>10.90.158.5</td>
+        </tr></tbody>
+      </table>
+	  <h3>C2M - DEV03</h3>
+      <table>
+        <thead><tr><th>App Link</th><th>WL Console</th><th>DB</th><th>Host/IP</th></tr></thead>
+        <tbody><tr>
+          <td><a href="https://10.90.158.3:9072/ouaf/cis.jsp">App</a></td><td><a href="https://10.90.158.3:7002/console">WL</a></td>
+          <td><a href="//10.90.159.3:1521/pc2mdev03.iwocfrac2mdevdb.iwocfrac2mdevdb.oraclevcn.com">jdbc:dev_c2m</a></td><td>10.90.158.3</td>
+        </tr></tbody>
+      </table>
+    </div>
+
+    <!-- DEV - BIP -->
+    <div class="section">
+      <h3>BIP - DEV</h3>
+      <table>
+        <thead><tr><th>App Link</th><th>WL Console</th><th>DB</th><th>Host/IP</th></tr></thead>
+        <tbody><tr>
+          <td><a href="https://10.90.158.7:9072/xmlpserver">App</a></td><td><a href="https://10.90.158.7:7002/console">WL</a></td>
+          <td><a href="//10.90.159.5:1521/pbipdev2.iwocfrac2mdevdb.iwocfrac2mdevdb.oraclevcn.com">jdbc:dev_bip</a></td><td>10.90.158.7</td>
+        </tr></tbody>
+      </table>
+    </div>
+
+    <!-- DEV - OUCSS -->
+    <div class="section">
+      <h3>OUCSS - DEV</h3>
+      <table>
+        <thead><tr><th>App Link</th><th>WL Console</th><th>DB</th><th>Host/IP</th></tr></thead>
+        <tbody><tr>
+          <td><a href="#">App</a></td><td><a href="#">WL</a></td>
+          <td><a href="#">jdbc:dev_oucss</a></td><td>10.0.0.3</td>
+        </tr></tbody>
+      </table>
+    </div>
+
+    <!-- DEV - Documaker -->
+    <div class="section">
+      <h3>Documaker - DEV</h3>
+      <table>
+        <thead><tr><th>App Link</th><th>WL Console</th><th>DB</th><th>Host/IP</th></tr></thead>
+        <tbody><tr>
+          <td><a href="#">NA</a></td><td><a href="https://10.90.158.19:7002/console">WL</a></td>
+          <td><a href="#">NA</a></td><td>10.90.158.19</td>
+        </tr></tbody>
+      </table>
+    </div>
+
+    <!-- SIT - C2M -->
+	<div class="section" style="background:#1f2937; /* dark background */
+                            padding:4px 10px;">
+    <h4 style="margin:0; 
+               font-size:12px; 
+               color:#f9fafb; /* light text color */
+               font-family: Arial, sans-serif;">
+        SIT ENVIRONMENT
+    </h4>
+    </div>
+
+    <div class="section">
+      <h3>C2M - SIT</h3>
+      <table>
+        <thead><tr><th>App Link</th><th>WL Console</th><th>DB</th><th>Host/IP</th></tr></thead>
+        <tbody><tr>
+          <td><a href="https://10.90.156.3:9072/ouaf/cis.jsp
+">App</a></td><td><a href="https://10.90.156.3:7002/console
+">WL</a></td>
+          <td><a href="//10.90.157.3:1521/pc2msit.iwocfrac2msdbsn.iwocfrac2msitdb.oraclevcn.com">jdbc</a></td><td>10.90.156.3</td>
+        </tr></tbody>
+      </table>
+    </div>
+
+    <!-- SIT - BIP -->
+    <div class="section">
+      <h3>BIP - SIT</h3>
+      <table>
+        <thead><tr><th>App Link</th><th>WL Console</th><th>DB</th><th>Host/IP</th></tr></thead>
+        <tbody><tr>
+          <td><a href="https://10.90.156.4:9072/xmlpserver
+">App</a></td><td><a href="https://10.90.156.4:7002/console
+">WL</a></td>
+          <td><a href="//10.90.157.3:1521/pbipsit.iwocfrac2msdbsn.iwocfrac2msitdb.oraclevcn.com">jdbc</a></td><td>10.90.156.4
+</td>
+        </tr></tbody>
+      </table>
+    </div>
+
+    <!-- SIT - OUCSS -->
+    <div class="section">
+      <h3>OUCSS - SIT</h3>
+      <table>
+        <thead><tr><th>App Link</th><th>WL Console</th><th>DB</th><th>Host/IP</th></tr></thead>
+        <tbody><tr>
+          <td><a href="#">App</a></td><td><a href="#">WL</a></td>
+          <td><a href="#">jdbc:sit_oucss</a></td><td>10.0.1.3</td>
+        </tr></tbody>
+      </table>
+    </div>
+
+    <!-- SIT - Documaker -->
+    <div class="section">
+      <h3>Documaker - SIT</h3>
+      <table>
+        <thead><tr><th>App Link</th><th>WL Console</th><th>DB</th><th>Host/IP</th></tr></thead>
+        <tbody><tr>
+          <td><a href="#">NA</a></td><td><a href="https://10.90.156.5:7002/console
+">WL</a></td>
+          <td><a href="#">NA</a></td><td>10.90.156.5
+</td>
+        </tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TEST Column -->
+  <div class="column" style="background:#6366f133">
+    <h2 style="background:#6366f1">TEST</h2>
+
+    <!-- Repeat for C2M/BIP/OUCSS/Documaker -->
+    <div class="section"><h3>C2M - TEST</h3><table><thead><tr><th>App Link</th><th>WL Console</th><th>DB</th><th>Host/IP</th></tr></thead>
+    <tbody><tr><td><a href="https://c2m-uat.iwater.ie/ouaf/cis.jsp
+">App</a></td><td><a href="https://10.90.154.19:7002/console
+">WL</a></td><td><a href="//iwofrac2muatdb0-scan.iwofrac2mutdbs1.iwofrac2mutdbv1.oraclevcn.com:1521/PC2MUAT">jdbc</a></td><td>10.90.154.19,10.90.154.29</td></tr></tbody></table></div>
+
+    <div class="section"><h3>BIP - TEST</h3><table><thead><tr><th>App Link</th><th>WL Console</th><th>DB</th><th>Host/IP</th></tr></thead>
+    <tbody><tr><td><a href="https://bip-uat.iwater.ie/xmlpserver/
+">App</a></td><td><a href="https://10.90.154.20:7002/console
+">WL</a></td><td><a href="//iwofrac2muatdb0-scan.iwofrac2mutdbs1.iwofrac2mutdbv1.oraclevcn.com:1521/PBIPUAT">jdbc</a></td><td>10.90.154.20,10.90.154.26</td></tr></tbody></table></div>
+
+    <div class="section"><h3>OUCSS - TEST</h3><table><thead><tr><th>App Link</th><th>WL Console</th><th>DB</th><th>Host/IP</th></tr></thead>
+    <tbody><tr><td><a href="#">App</a></td><td><a href="#">WL</a></td><td><a href="#">jdbc:test_oucss</a></td><td>10.0.2.3</td></tr></tbody></table></div>
+
+    <div class="section"><h3>Documaker - TEST</h3><table><thead><tr><th>App Link</th><th>WL Console</th><th>DB</th><th>Host/IP</th></tr></thead>
+    <tbody><tr><td><a href="https://doc-uat.iwater.ie/services/DocumentService?wsdl
+">App</a></td><td><a href="https://10.90.154.18:7002/console
+">WL</a></td><td><a href="#">NA</a></td><td>10.90.154.18,10.90.154.21</td></tr></tbody></table></div>
+  </div>
+
+  <!-- PRE-PROD + PROD Column -->
+  <div class="column" style="background:#9333ea33">
+    <h2 style="background:#9333ea">PRE-PROD & PROD</h2>
+
+    <!-- Pre-Prod -->
+    <div class="section"><h3>C2M - PRE-PROD</h3><table><thead><tr><th>App Link</th><th>WL Console</th><th>DB</th><th>Host/IP</th></tr></thead>
+    <tbody><tr><td><a href="https://c2m-ppe.iwater.ie:8443/__protected/ouaf/cis.jsp
+">App</a></td><td><a href="https://10.90.152.25:7002/console
+">WL</a></td><td><a href="//iwofrac2mppedb0-scan.iwofrac2mppdbs1.iwofrac2mppdbv1.oraclevcn.com:1521/PC2MPPE">jdbc</a></td><td>10.90.152.25,10.90.152.26</td></tr></tbody></table></div>
+    <div class="section"><h3>BIP - PRE-PROD</h3><table><thead><tr><th>App Link</th><th>WL Console</th><th>DB</th><th>Host/IP</th></tr></thead>
+    <tbody><tr><td><a href="https://bip-ppe.iwater.ie/xmlpserver/
+">App</a></td><td><a href="https://10.90.152.28:7002/console
+">WL</a></td><td><a href="//iwofrac2mppedb0-scan.iwofrac2mppdbs1.iwofrac2mppdbv1.oraclevcn.com:1521/PBIPPPE
+">jdbc</a></td><td>10.90.152.28,10.90.152.19</td></tr></tbody></table></div>
+    <div class="section"><h3>OUCSS - PRE-PROD</h3><table><thead><tr><th>App Link</th><th>WL Console</th><th>DB</th><th>Host/IP</th></tr></thead>
+    <tbody><tr><td><a href="#">App</a></td><td><a href="#">WL</a></td><td><a href="#">jdbc:preprod_oucss</a></td><td>10.0.3.3</td></tr></tbody></table></div>
+    <div class="section"><h3>Documaker - PRE-PROD</h3><table><thead><tr><th>App Link</th><th>WL Console</th><th>DB</th><th>Host/IP</th></tr></thead>
+    <tbody><tr><td><a href="https://doc-ppe.iwater.ie/services/DocumentService?wsdl
+">App</a></td><td><a href="https://10.90.152.30:7002/console
+">WL</a></td><td><a href="#">NA</a></td><td>10.90.152.30,10.90.152.29</td></tr></tbody></table></div>
+
+    <!-- PROD -->
+	<div class="section" style="background:#1f2937; /* dark background */
+                            padding:4px 10px;">
+    <h4 style="margin:0; 
+               font-size:12px; 
+               color:#f9fafb; /* light text color */
+               font-family: Arial, sans-serif;">
+        PROD ENVIRONMENT
+    </h4>
+    </div>
+    <div class="section"><h3>C2M - PROD</h3><table><thead><tr><th>App Link</th><th>WL Console</th><th>DB</th><th>Host/IP</th></tr></thead>
+    <tbody><tr><td><a href="https://c2m-prd.iwater.ie/__protected/ouaf/cis.jsp
+">App</a></td><td><a href="https://10.90.150.30:7002/console
+">WL</a></td><td><a href="//iwofrac2mprddb0-scan.iwofrac2mprdbs1.iwofrac2mprdbv1.oraclevcn.com:1521/PC2MPRD">jdbc</a></td><td>10.90.150.30,10.90.150.28</td></tr></tbody></table></div>
+    <div class="section"><h3>BIP - PROD</h3><table><thead><tr><th>App Link</th><th>WL Console</th><th>DB</th><th>Host/IP</th></tr></thead>
+    <tbody><tr><td><a href="https://bip-prd.iwater.ie/xmlpserver/">App</a></td><td><a href="https://10.90.150.24:7002/console
+">WL</a></td><td><a href="//iwofrac2mprddb0-scan.iwofrac2mprdbs1.iwofrac2mprdbv1.oraclevcn.com:1521/PBIPPRD">jdbc</a></td><td>10.90.150.24,10.90.150.21</td></tr></tbody></table></div>
+    <div class="section"><h3>OUCSS - PROD</h3><table><thead><tr><th>App Link</th><th>WL Console</th><th>DB</th><th>Host/IP</th></tr></thead>
+    <tbody><tr><td><a href="#">App</a></td><td><a href="#">WL</a></td><td><a href="#">jdbc:prod_oucss</a></td><td>10.0.4.3</td></tr></tbody></table></div>
+    <div class="section"><h3>Documaker - PROD</h3><table><thead><tr><th>App Link</th><th>WL Console</th><th>DB</th><th>Host/IP</th></tr></thead>
+    <tbody><tr><td><a href="https://doc-prd.iwater.ie/services/DocumentService?wsdl
+">App</a></td><td><a href="https://10.90.150.29:7002/console
+">WL</a></td><td><a href="#">NA</a></td><td>10.90.150.29,10.90.150.19</td></tr></tbody></table></div>
+  </div>
+
+  <!-- Training + PROJ1 + PROJ2 Column -->
+  <div class="column" style="background:#dc262633">
+    <h2 style="background:#dc2626">Training / PROJ1 / PROJ2</h2>
+
+    <!-- Training -->
+    <div class="section"><h3>C2M - Training</h3><table><thead><tr><th>App Link</th><th>WL Console</th><th>DB</th><th>Host/IP</th></tr></thead>
+    <tbody><tr><td><a href="https://c2m-trn.iwater.ie/__protected/ouaf/cis.jsp
+">App</a></td><td><a href="#">WL</a></td><td><a href="//10.90.159.162:1521/pc2mtrn.iwocfrac2mtrndb.iwocfrac2mdevdb.oraclevcn.com">jdbc</a></td><td>10.0.5.1</td></tr></tbody></table></div>
+
+    <!-- PROJ1 -->
+	<div class="section" style="background:#1f2937; /* dark background */
+                            padding:4px 10px;">
+    <h4 style="margin:0; 
+               font-size:12px; 
+               color:#f9fafb; /* light text color */
+               font-family: Arial, sans-serif;">
+        PROJ1 ENVIRONMENT
+    </h4>
+    </div>
+    <div class="section"><h3>C2M - PROJ1</h3><table><thead><tr><th>App Link</th><th>WL Console</th><th>DB</th><th>Host/IP</th></tr></thead>
+    <tbody><tr><td><a href="#">NA</a></td><td><a href="#">NA</a></td><td><a href="#">NA</a></td><td>NA</td></tr></tbody></table></div>
+
+
+    <!-- PROJ2 -->
+	<div class="section" style="background:#1f2937; /* dark background */
+                            padding:4px 10px;">
+    <h4 style="margin:0; 
+               font-size:12px; 
+               color:#f9fafb; /* light text color */
+               font-family: Arial, sans-serif;">
+        PROJ2 ENVIRONMENT
+    </h4>
+    </div>
+    <div class="section"><h3>C2M - PROJ2</h3><table><thead><tr><th>App Link</th><th>WL Console</th><th>DB</th><th>Host/IP</th></tr></thead>
+    <tbody><tr><td><a href="https://10.90.158.205:9072/ouaf/cis.jsp
+">App</a></td><td><a href="https://10.90.158.205:7002/console
+">WL</a></td><td><a href="//10.90.159.194:1521/pc2mprj02.iwofrac2mjdbsnt.iwocfrac2mdevdb.oraclevcn.com">jdbc</a></td><td>10.90.158.205</td></tr></tbody></table></div>
+    <div class="section"><h3>Documaker - PROJ2</h3><table><thead><tr><th>App Link</th><th>WL Console</th><th>DB</th><th>Host/IP</th></tr></thead>
+    <tbody><tr><td><a href="#">NA</a></td><td><a href="https://10.90.158.203:7002/console
+">WL</a></td><td><a href="#">NA</a></td><td>10.90.158.203</td></tr></tbody></table></div>
+  </div>
+
+</div>
+</body>
+</html>
