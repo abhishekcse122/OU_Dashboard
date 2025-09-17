@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Protected Environment Password Dashboard</title>
+<style>
+  :root{
+    --bg:#071125; --card:#0f172a; --accent:#facc15; --muted:#9fb0c8; --text:#e6eef8;
+  }
+  body{ margin:0; font-family: Inter, Arial, sans-serif; background:linear-gradient(180deg,#071125 0%,#05060a 100%); color:var(--text); }
+  .centered{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; box-sizing:border-box; }
+  .login-card{ background:var(--card); width:900px; border-radius:12px; padding:28px; box-shadow: 0 20px 60px rgba(2,6,23,0.7); display:flex; gap:24px; align-items:center; }
+  .brand{ flex:1; }
+  h1{ margin:0 0 8px 0; font-size:28px; text-align:center; }
+  p.lead{ margin:0;color:var(--muted); text-align:center; }
+  .form{ width:420px; }
+  label{ display:block; font-size:13px; color:var(--muted); margin-bottom:6px; }
+  input[type="text"], input[type="password"]{ width:100%; padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); color:var(--text); box-sizing:border-box; margin-bottom:12px; }
+  .actions{ display:flex; gap:10px; align-items:center; }
+  button{ padding:10px 14px; border-radius:8px; border:none; cursor:pointer; background:#111827; color:var(--text); box-shadow: inset 0 -2px 0 rgba(255,255,255,0.02); }
+  button.primary{ background:var(--accent); color:#08121a; font-weight:700; }
+  .error{ color:#ff6b6b; display:none; margin-top:8px; }
+  .hint{ font-size:12px; color:var(--muted); margin-top:8px; }
+  /* dashboard styles */
+  #dashboard{ display:none; padding:32px; }
+  .header{ text-align:center; margin-bottom:18px; }
+  .header h1{ margin:0; font-size:34px; }
+  .env-card { background: linear-gradient(180deg, #0e1724 0%, #071022 100%); border-radius:12px; padding:24px; margin-bottom:28px; box-shadow: 0 20px 40px rgba(2,6,23,0.6); }
+  .env-card h2 { color: var(--accent); margin:0 0 16px 0; font-size:20px; }
+  table { width:100%; border-collapse:collapse; font-size:15px; }
+  thead th { text-align:left; padding:12px 10px; color: #9fb0c8; font-weight:600; border-bottom:1px solid rgba(255,255,255,0.04); }
+  tbody td { padding:14px 10px; border-bottom:1px solid rgba(255,255,255,0.02); color:var(--text); }
+  .col-user { width:28%; }
+  .col-action { width:18%; text-align:right; }
+  .masked { letter-spacing:3px; user-select:none; opacity:0.95; }
+  .copy-btn { background:transparent; border:1px solid rgba(255,255,255,0.06); color:var(--text); padding:6px 10px; border-radius:8px; cursor:pointer; }
+  .copied { color:#10b981; margin-left:8px; display:none; font-size:13px; }
+</style>
+</head>
+<body>
+  <!-- Login -->
+  <div class="centered" id="loginScreen">
+    <div class="login-card" role="dialog" aria-modal="true" aria-label="Admin login">
+      <div class="brand">
+        <h1>Environment Password Dashboard</h1>
+        <p class="lead">Protected access — enter admin credentials to continue</p>
+      </div>
+      <div class="form" aria-hidden="false">
+        <label for="username">Username</label>
+        <input id="username" type="text" autocomplete="username" placeholder="admin" value="">
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password" placeholder="Enter admin password">
+        <div class="actions" style="margin-top:6px;">
+          <button id="loginBtn" class="primary">Login</button>
+          <button id="cancelBtn" type="button">Cancel</button>
+        </div>
+        <div id="err" class="error">Invalid username or password</div>
+        <div class="hint">Username must be <strong>admin</strong>. Password is verified by a SHA-256 hash — plaintext admin password is not stored in the page.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard (hidden until login) -->
+  <div id="dashboard" aria-hidden="true">
+    <div class="header">
+      <h1>Environment Password Dashboard</h1>
+      <p style="color:var(--muted); margin:6px 0 18px;">Click <strong>Copy</strong> to copy <em>username:password</em> for that account. Passwords are masked on screen.</p>
+    </div>
+
+    <!-- Environment cards (each env separate) -->
+    <div class="env-card" id="env-DEV01">
+      <h2>DEV01</h2>
+      <table>
+        <thead><tr><th>Application</th><th class="col-user">App User</th><th class="col-user">WebLogic User</th><th class="col-user">DB User</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>C2M</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+          <tr>
+            <td>BIP</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+          <tr>
+            <td>Documaker</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+          <tr>
+            <td>OUCSS</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- DEV03 -->
+    <div class="env-card" id="env-DEV03">
+      <h2>DEV03</h2>
+      <table>
+        <thead><tr><th>Application</th><th class="col-user">App User</th><th class="col-user">WebLogic User</th><th class="col-user">DB User</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>C2M</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+          <tr>
+            <td>BIP</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+          <tr>
+            <td>Documaker</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+          <tr>
+            <td>OUCSS</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TEST -->
+    <div class="env-card" id="env-TEST">
+      <h2>TEST</h2>
+      <table>
+        <thead><tr><th>Application</th><th class="col-user">App User</th><th class="col-user">WebLogic User</th><th class="col-user">DB User</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>C2M</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+          <tr>
+            <td>BIP</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+          <tr>
+            <td>Documaker</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+          <tr>
+            <td>OUCSS</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PRE-PROD -->
+    <div class="env-card" id="env-PREPROD">
+      <h2>PRE-PROD</h2>
+      <table>
+        <thead><tr><th>Application</th><th class="col-user">App User</th><th class="col-user">WebLogic User</th><th class="col-user">DB User</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>C2M</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+          <tr>
+            <td>BIP</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+          <tr>
+            <td>Documaker</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+          <tr>
+            <td>OUCSS</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PROD -->
+    <div class="env-card" id="env-PROD">
+      <h2>PROD</h2>
+      <table>
+        <thead><tr><th>Application</th><th class="col-user">App User</th><th class="col-user">WebLogic User</th><th class="col-user">DB User</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>C2M</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+          <tr>
+            <td>BIP</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+          <tr>
+            <td>Documaker</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+          <tr>
+            <td>OUCSS</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TRAINING -->
+    <div class="env-card" id="env-TRAINING">
+      <h2>TRAINING</h2>
+      <table>
+        <thead><tr><th>Application</th><th class="col-user">App User</th><th class="col-user">WebLogic User</th><th class="col-user">DB User</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>C2M</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+          <tr>
+            <td>BIP</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+          <tr>
+            <td>Documaker</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+          <tr>
+            <td>OUCSS</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PROJ1 -->
+    <div class="env-card" id="env-PROJ1">
+      <h2>PROJ1</h2>
+      <table>
+        <thead><tr><th>Application</th><th class="col-user">App User</th><th class="col-user">WebLogic User</th><th class="col-user">DB User</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>C2M</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+          <tr>
+            <td>BIP</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+          <tr>
+            <td>Documaker</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+          <tr>
+            <td>OUCSS</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PROJ2 -->
+    <div class="env-card" id="env-PROJ2">
+      <h2>PROJ2</h2>
+      <table>
+        <thead><tr><th>Application</th><th class="col-user">App User</th><th class="col-user">WebLogic User</th><th class="col-user">DB User</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>C2M</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+          <tr>
+            <td>BIP</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+          <tr>
+            <td>Documaker</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+          <tr>
+            <td>OUCSS</td>
+            <td>SYSUSER / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="c3lzdXNlcjAw" data-user="SYSUSER">Copy</button> <span class="copied">Copied</span></td>
+            <td>weblogic / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTEyMw==" data-user="weblogic">Copy</button> <span class="copied">Copied</span></td>
+            <td>CISADM / <span class="masked">•••••••</span> <button class="copy-btn" data-b64="V2VsY29tZTE=" data-user="CISADM">Copy</button> <span class="copied">Copied</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div> <!-- end dashboard -->
+
+<script>
+// Client-side hashed login (admin / NbqPpi9yL)
+// Stored SHA-256 hex of the admin password (NbqPpi9yL)
+const EXPECTED_USERNAME = "admin";
+const EXPECTED_PWD_HASH = "ca149b851b6c6d71e2b64506fedb62b6f2e46186f19ceeff4e6e39807a434cb7";
+
+const loginBtn = document.getElementById('loginBtn');
+const cancelBtn = document.getElementById('cancelBtn');
+const err = document.getElementById('err');
+const usernameEl = document.getElementById('username');
+const passwordEl = document.getElementById('password');
+const dashboard = document.getElementById('dashboard');
+const loginScreen = document.getElementById('loginScreen');
+
+function buf2hex(buffer) {
+  return Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('');
+}
+
+async function sha256hex(text) {
+  const enc = new TextEncoder();
+  const data = enc.encode(text);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return buf2hex(hash);
+}
+
+function safeCompare(a,b){
+  if(a.length !== b.length) return false;
+  let result = 0;
+  for(let i=0;i<a.length;i++){ result |= a.charCodeAt(i) ^ b.charCodeAt(i); }
+  return result === 0;
+}
+
+loginBtn.addEventListener('click', async function(e){
+  e.preventDefault();
+  err.style.display = 'none';
+
+  const enteredUser = (usernameEl.value || '').trim();
+  const enteredPwd = passwordEl.value || '';
+
+  if(!enteredUser || !enteredPwd){
+    err.textContent = 'Please enter username and password';
+    err.style.display = 'block';
+    return;
+  }
+
+  if(enteredUser !== EXPECTED_USERNAME){
+    err.textContent = 'Invalid username or password';
+    err.style.display = 'block';
+    return;
+  }
+
+  try {
+    const h = await sha256hex(enteredPwd);
+    if(safeCompare(h, EXPECTED_PWD_HASH)){
+      // success: hide login and show dashboard
+      loginScreen.style.display = 'none';
+      dashboard.style.display = 'block';
+      dashboard.setAttribute('aria-hidden','false');
+      // focus first copy button for convenience
+      const firstBtn = document.querySelector('.copy-btn');
+      if(firstBtn) firstBtn.focus();
+    } else {
+      err.textContent = 'Invalid username or password';
+      err.style.display = 'block';
+    }
+  } catch (ex) {
+    console.error(ex);
+    err.textContent = 'An error occurred';
+    err.style.display = 'block';
+  }
+});
+
+cancelBtn.addEventListener('click', function(){
+  usernameEl.value=''; passwordEl.value='';
+  err.style.display='none';
+});
+
+// Copy buttons: decode base64 then copy "username:password"
+document.querySelectorAll('.copy-btn').forEach(btn=>{
+  btn.addEventListener('click', async function(){
+    const b64 = btn.getAttribute('data-b64');
+    const user = btn.getAttribute('data-user');
+    // decode base64
+    let pwd = '';
+    try {
+      pwd = decodeURIComponent(atob(b64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+    } catch(e){ pwd = atob(b64); }
+    const text = user + ':' + pwd;
+    try {
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(text);
+      } else {
+        const ta = document.createElement('textarea'); ta.value = text; ta.style.position='fixed'; ta.style.left='-9999px';
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+      }
+      // show temporary copied label
+      const copiedLabel = btn.nextElementSibling;
+      if(copiedLabel){
+        copiedLabel.style.display='inline';
+        setTimeout(()=> copiedLabel.style.display='none', 1800);
+      }
+    } catch(err){
+      alert('Copy failed: ' + err);
+    }
+  });
+});
+</script>
+</body>
+</html>
